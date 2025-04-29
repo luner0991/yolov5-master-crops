@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.disease.mapper.CropMapper">
+    
+    <resultMap type="Crop" id="CropResult">
+        <result property="cropId"    column="crop_id"    />
+        <result property="cropName"    column="crop_name"    />
+        <result property="imgUrl"    column="imgUrl"    />
+    </resultMap>
+
+    <sql id="selectCropVo">
+        select crop_id, crop_name, imgUrl from t_crop
+    </sql>
+
+    <select id="selectCropList" parameterType="Crop" resultMap="CropResult">
+        <include refid="selectCropVo"/>
+        <where>  
+            <if test="cropName != null  and cropName != ''"> and crop_name like concat('%', #{cropName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectCropByCropId" parameterType="Integer" resultMap="CropResult">
+        <include refid="selectCropVo"/>
+        where crop_id = #{cropId}
+    </select>
+
+    <insert id="insertCrop" parameterType="Crop" useGeneratedKeys="true" keyProperty="cropId">
+        insert into t_crop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cropName != null">crop_name,</if>
+            <if test="imgUrl != null">imgUrl,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cropName != null">#{cropName},</if>
+            <if test="imgUrl != null">#{imgUrl},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCrop" parameterType="Crop">
+        update t_crop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cropName != null">crop_name = #{cropName},</if>
+            <if test="imgUrl != null">imgUrl = #{imgUrl},</if>
+        </trim>
+        where crop_id = #{cropId}
+    </update>
+
+    <delete id="deleteCropByCropId" parameterType="Integer">
+        delete from t_crop where crop_id = #{cropId}
+    </delete>
+
+    <delete id="deleteCropByCropIds" parameterType="String">
+        delete from t_crop where crop_id in 
+        <foreach item="cropId" collection="array" open="(" separator="," close=")">
+            #{cropId}
+        </foreach>
+    </delete>
+</mapper>
